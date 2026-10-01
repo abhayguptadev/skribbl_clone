@@ -5,11 +5,6 @@ from rest_framework import status
 from game.game_manager import game_manager
 from game.word_manager import WORD_BANKS
 from .serializers import CreateRoomSerializer, JoinRoomSerializer
-from django.db import transaction
-from .models import Room, Player
-from .serializers import RoomSerializer, PlayerSerializer
-
-
 
 class CreateRoomView(APIView):
     def post(self, request):
