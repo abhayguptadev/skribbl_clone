@@ -156,9 +156,9 @@ class GameScreen extends StatelessWidget {
                     Text(
                       room.revealedWord?.toUpperCase() ?? '',
                       style: const TextStyle(
-                        color: Color(0xFFF59E0B),
+                        color: Colors.white,
                         fontWeight: FontWeight.w900,
-                        fontSize: 24,
+                        fontSize: 14,
                         letterSpacing: 4,
                       ),
                     ),
@@ -256,7 +256,7 @@ class GameScreen extends StatelessWidget {
                           isDrawer 
                               ? 'Choose one of these words to start drawing' 
                               : '$drawerName is choosing a word...',
-                          style: const TextStyle(color: Colors.white54, fontSize: 14),
+                          style: const TextStyle(color: Colors.white54, fontSize: 24),
                           textAlign: TextAlign.center,
                         ),
                         const SizedBox(height: 32),
@@ -276,7 +276,9 @@ class GameScreen extends StatelessWidget {
                                 onPressed: () => game.chooseWord(word),
                                 child: Text(
                                   word.toUpperCase(),
-                                  style: const TextStyle(letterSpacing: 2, fontWeight: FontWeight.w900),
+                                  style: const TextStyle(letterSpacing: 2,
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.w900),
                                 ),
                               );
                             }).toList(),

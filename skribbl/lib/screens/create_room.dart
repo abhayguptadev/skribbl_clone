@@ -54,7 +54,7 @@ class _CreateRoomScreenState extends State<CreateRoomScreen> {
       if (mounted) {
         setState(() {
           isLoading = false;
-          errorMessage = e.toString().replaceAll('Exception: ', '');
+          errorMessage = "Try After Some Time ";
         });
       }
     }
@@ -195,6 +195,12 @@ class _CreateRoomScreenState extends State<CreateRoomScreen> {
                     ],
                   ),
                   child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.blueAccent,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    ),
                     onPressed: isLoading ? null : _handleCreate,
                     child: isLoading
                         ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))

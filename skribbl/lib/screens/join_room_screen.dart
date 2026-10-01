@@ -48,7 +48,7 @@ class _JoinRoomScreenState extends State<JoinRoomScreen> {
       if (mounted) {
         setState(() {
           isLoading = false;
-          errorMessage = e.toString().replaceAll('Exception: ', '');
+          errorMessage = "Try After Some Time";
         });
       }
     }
