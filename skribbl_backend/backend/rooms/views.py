@@ -102,6 +102,7 @@ class QuickJoinRoomView(APIView):
 
         for active_room in game_manager.rooms.values():
             if active_room.phase in (
+                "waiting",
                 "word_choice",
                 "drawing",
                 "round_result",
