@@ -458,6 +458,30 @@ class GameProvider extends ChangeNotifier {
     }
   }
 
+  Future<void> quickJoinRoom({
+    required String playerName,
+    String avatar = '🎨',
+  }) async {
+    myAvatar = avatar;
+    final res = await apiService.quickJoin(
+      playerName: playerName,
+      avatar: avatar,
+    );
+    currentRoomCode = res['roomCode'];
+    myPlayerId = res['playerId'];
+    myPlayerName = playerName;
+    isHost = false;
+    roomState = RoomState.fromJson(res['room']);
+    wsService.connect(currentRoomCode);
+    wsService.sendEvent('join_room', currentRoomCode, {
+      'roomCode': currentRoomCode,
+      'playerId': myPlayerId,
+      'playerName': myPlayerName,
+      'avatar': myAvatar,
+    });
+    notifyListeners();
+  }
+
   @override
   void dispose() {
     wsService.disconnect();

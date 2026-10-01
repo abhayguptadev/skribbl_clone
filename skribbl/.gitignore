@@ -17,6 +17,7 @@ migrate_working_dir/
 *.ipr
 *.iws
 .idea/
+.vercel/
 
 
 
@@ -53,3 +54,5 @@ app.*.map.json
 # api end points
 
 app_config.dart
+.vercel
+.env*

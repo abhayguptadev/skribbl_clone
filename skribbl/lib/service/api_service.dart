@@ -79,4 +79,31 @@ class ApiService {
 
     throw Exception('Room not found');
   }
+Future<Map<String, dynamic>> quickJoin({
+  required String playerName,
+  String avatar = '🎨',
+}) async {
+  final uri = Uri.parse('$baseUrl/api/rooms/quick-join/');
+
+  final response = await http.post(
+    uri,
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: jsonEncode({
+      'player_name': playerName,
+      'avatar': avatar,
+    }),
+  );
+
+  final data = jsonDecode(response.body);
+
+  if (response.statusCode == 201 || response.statusCode == 200) {
+    return data as Map<String, dynamic>;
+  }
+
+  throw Exception(
+    data['error'] ?? 'Unable to quick join room',
+  );
+}
 }
