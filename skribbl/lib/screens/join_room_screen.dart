@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import 'package:skribbl/state/gameProvider.dart';
-import 'lobbyScreen.dart';
+import 'package:skribbl/state/game_provider.dart';
+import 'lobby_screen.dart';
 class JoinRoomScreen extends StatefulWidget {
   final String playerName;
   final String avatar;

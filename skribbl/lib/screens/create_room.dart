@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:skribbl/state/gameProvider.dart';
-import 'package:skribbl/screens/lobbyScreen.dart';
+import 'package:skribbl/state/game_provider.dart';
+import 'package:skribbl/screens/lobby_screen.dart';
 
 class CreateRoomScreen extends StatefulWidget {
   final String playerName;

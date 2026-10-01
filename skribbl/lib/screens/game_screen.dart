@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:skribbl/state/gameProvider.dart';
-import 'package:skribbl/widget/drawingCanav.dart';
-import 'package:skribbl/widget/drawingToolbar.dart';
+import 'package:skribbl/state/game_provider.dart';
+import 'package:skribbl/widget/drawing_canvas.dart';
+import 'package:skribbl/widget/drawing_toolbar.dart';
 import 'package:skribbl/widget/scoreboard.dart';
 import 'package:skribbl/widget/chat.dart';
-import 'leaderboardScreen.dart';
+import 'leaderboard_screen.dart';
 
 class GameScreen extends StatelessWidget {
   const GameScreen({super.key});
@@ -363,7 +363,7 @@ class GameScreen extends StatelessWidget {
                           child: ListView.separated(
                             shrinkWrap: true,
                             itemCount: (room.players as List).length,
-                            separatorBuilder: (_, __) => const SizedBox(height: 8),
+                            separatorBuilder: (_, index) => const SizedBox(height: 8),
                             itemBuilder: (context, index) {
                               final p = room.players[index];
                               if (p.roundScore <= 0) return const SizedBox.shrink();

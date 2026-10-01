@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import 'createRoom.dart';
-import 'joinRoomScreen.dart';
+import 'create_room.dart';
+import 'join_room_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});

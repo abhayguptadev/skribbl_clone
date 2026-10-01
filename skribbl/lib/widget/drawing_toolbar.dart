@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:skribbl/state/gameProvider.dart';
+import 'package:skribbl/state/game_provider.dart';
 
 class DrawingToolbarWidget extends StatelessWidget {
   const DrawingToolbarWidget({super.key});
@@ -39,7 +39,7 @@ class DrawingToolbarWidget extends StatelessWidget {
           Wrap(
             spacing: 6,
             children: colors.map((c) {
-              final isSelected = !game.isEraser && game.currentColor.value == c.value;
+              final isSelected = !game.isEraser && game.currentColor.toARGB32() == c.toARGB32();
               return GestureDetector(
                 onTap: () => game.setDrawingColor(c),
                 child: Container(

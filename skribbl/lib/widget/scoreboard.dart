@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:skribbl/state/gameProvider.dart';
+import 'package:skribbl/state/game_provider.dart';
 
 
 class ScoreboardWidget extends StatelessWidget {

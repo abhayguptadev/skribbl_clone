@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
-import 'package:skribbl/state/gameProvider.dart';
+import 'package:skribbl/state/game_provider.dart';
 
-import 'gameScreen.dart';
+import 'game_screen.dart';
 class LobbyScreen extends StatelessWidget {
   const LobbyScreen({super.key});
 

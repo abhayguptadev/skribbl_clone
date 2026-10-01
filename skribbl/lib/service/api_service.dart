@@ -4,7 +4,7 @@ import 'package:http/http.dart' as http;
 class ApiService {
   final String baseUrl;
 
-  ApiService({this.baseUrl = ''});
+  ApiService({required this.baseUrl});
 
   Future<Map<String, dynamic>> createRoom({
     required String playerName,
@@ -19,6 +19,7 @@ class ApiService {
     String category = 'all',
   }) async {
     final uri = Uri.parse('$baseUrl/api/rooms/');
+
     final response = await http.post(
       uri,
       headers: {'Content-Type': 'application/json'},
@@ -38,9 +39,9 @@ class ApiService {
 
     if (response.statusCode == 201 || response.statusCode == 200) {
       return jsonDecode(response.body) as Map<String, dynamic>;
-    } else {
-      throw Exception('Failed to create room: ${response.body}');
     }
+
+    throw Exception('Failed to create room: ${response.body}');
   }
 
   Future<Map<String, dynamic>> joinRoom({
@@ -49,6 +50,7 @@ class ApiService {
     String avatar = '🎨',
   }) async {
     final uri = Uri.parse('$baseUrl/api/rooms/join/');
+
     final response = await http.post(
       uri,
       headers: {'Content-Type': 'application/json'},
@@ -61,18 +63,20 @@ class ApiService {
 
     if (response.statusCode == 200) {
       return jsonDecode(response.body) as Map<String, dynamic>;
-    } else {
-      throw Exception('Failed to join room: ${response.body}');
     }
+
+    throw Exception('Failed to join room: ${response.body}');
   }
 
   Future<Map<String, dynamic>> getRoomDetail(String roomCode) async {
     final uri = Uri.parse('$baseUrl/api/rooms/$roomCode/');
+
     final response = await http.get(uri);
+
     if (response.statusCode == 200) {
       return jsonDecode(response.body) as Map<String, dynamic>;
-    } else {
-      throw Exception('Room not found');
     }
+
+    throw Exception('Room not found');
   }
 }
