@@ -52,4 +52,4 @@ app.*.map.json
 
 # api end points
 
-config/app_config.dart
+app_config.dart
