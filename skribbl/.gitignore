@@ -18,7 +18,8 @@ migrate_working_dir/
 *.iws
 .idea/
 .vercel/
-
+.env.local
+vercel.json
 
 
 # The .vscode folder contains launch configuration and tasks you configure in
