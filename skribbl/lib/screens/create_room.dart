@@ -230,12 +230,12 @@ class _CreateRoomScreenState extends State<CreateRoomScreen> {
                   value: hintsEnabled,
                   onChanged: (val) => setState(() => hintsEnabled = val),
                 ),
-                // _buildToggle(
-                //   title: 'Private Room',
-                //   subtitle: 'Invite only via code',
-                //   value: isPrivate,
-                //   onChanged: (val) => setState(() => isPrivate = val),
-                // ),
+                _buildToggle(
+                  title: 'Private Room',
+                  subtitle: 'Invite only via code',
+                  value: isPrivate,
+                  onChanged: (val) => setState(() => isPrivate = val),
+                ),
 
                 const SizedBox(height: 32),
                 Container(

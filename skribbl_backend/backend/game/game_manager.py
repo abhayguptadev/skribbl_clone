@@ -339,7 +339,7 @@ class GameRoom:
 
     def finish_game(self):
         self.phase = GamePhase.GAME_OVER
-        # Save session to MongoDB
+        # Save session to SQLite
         session_data = {
             "room_code": self.code,
             "total_rounds": self.settings.total_rounds,
