@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
-
 import '../models/player.dart';
 import '../models/room.dart';
 import '../models/stroke.dart';
-
 import 'package:skribbl/models/chat_msg.dart';
 import 'package:skribbl/service/api_service.dart';
 import 'package:skribbl/service/web_socket_service.dart';
@@ -29,7 +27,6 @@ class GameProvider extends ChangeNotifier {
 
   GameProvider({required this.apiService, required String wsUrl}) {
     wsService = WebSocketService(serverUrl: wsUrl);
-
     wsService.addListener(_handleIncomingWebSocketMessage);
   }
 
@@ -37,26 +34,22 @@ class GameProvider extends ChangeNotifier {
     myPlayerId = id;
     myPlayerName = name;
     isHost = host;
-
     notifyListeners();
   }
 
   void setDrawingColor(Color color) {
     currentColor = color;
     isEraser = false;
-
     notifyListeners();
   }
 
   void setBrushSize(double size) {
     currentBrushSize = size;
-
     notifyListeners();
   }
 
   void toggleEraser() {
     isEraser = !isEraser;
-
     notifyListeners();
   }
 
@@ -74,7 +67,6 @@ class GameProvider extends ChangeNotifier {
     String category = 'all',
   }) async {
     myAvatar = avatar;
-
     final res = await apiService.createRoom(
       playerName: playerName,
       avatar: avatar,
@@ -91,11 +83,9 @@ class GameProvider extends ChangeNotifier {
     myPlayerId = res['playerId'];
     myPlayerName = playerName;
     isHost = true;
-
     roomState = RoomState.fromJson(res['room']);
 
     wsService.connect(currentRoomCode);
-
     wsService.sendEvent('join_room', currentRoomCode, {
       'roomCode': currentRoomCode,
       'playerId': myPlayerId,
@@ -112,7 +102,6 @@ class GameProvider extends ChangeNotifier {
     String avatar = '🎨',
   }) async {
     myAvatar = avatar;
-
     final res = await apiService.joinRoom(
       playerName: playerName,
       roomCode: roomCode,
@@ -123,11 +112,36 @@ class GameProvider extends ChangeNotifier {
     myPlayerId = res['playerId'];
     myPlayerName = playerName;
     isHost = false;
-
     roomState = RoomState.fromJson(res['room']);
 
     wsService.connect(currentRoomCode);
+    wsService.sendEvent('join_room', currentRoomCode, {
+      'roomCode': currentRoomCode,
+      'playerId': myPlayerId,
+      'playerName': myPlayerName,
+      'avatar': myAvatar,
+    });
 
+    notifyListeners();
+  }
+
+  Future<void> quickJoinRunningGame({
+    required String playerName,
+    String avatar = '🎨',
+  }) async {
+    myAvatar = avatar;
+    final res = await apiService.quickJoin(
+      playerName: playerName,
+      avatar: avatar,
+    );
+
+    currentRoomCode = res['roomCode'];
+    myPlayerId = res['playerId'];
+    myPlayerName = playerName;
+    isHost = false;
+    roomState = RoomState.fromJson(res['room']);
+
+    wsService.connect(currentRoomCode);
     wsService.sendEvent('join_room', currentRoomCode, {
       'roomCode': currentRoomCode,
       'playerId': myPlayerId,
@@ -139,28 +153,18 @@ class GameProvider extends ChangeNotifier {
   }
 
   void startGame() {
-    if (!isHost || currentRoomCode.isEmpty) {
-      return;
-    }
-
+    if (!isHost || currentRoomCode.isEmpty) return;
     wsService.sendEvent('start_game', currentRoomCode, {});
   }
 
   void chooseWord(String word) {
-    if (!isMyTurn || currentRoomCode.isEmpty) {
-      return;
-    }
-
+    if (!isMyTurn || currentRoomCode.isEmpty) return;
     wsService.sendEvent('word_chosen', currentRoomCode, {'word': word});
   }
 
   void onDrawStart(double x, double y) {
-    if (!isMyTurn) {
-      return;
-    }
-
+    if (!isMyTurn) return;
     final colorToUse = isEraser ? const Color(0xFFFFFFFF) : currentColor;
-
     final point = DrawPoint(
       x: x,
       y: y,
@@ -168,133 +172,86 @@ class GameProvider extends ChangeNotifier {
       size: isEraser ? currentBrushSize * 2 : currentBrushSize,
       isStart: true,
     );
-
     strokes.add(point);
-
     notifyListeners();
 
-    wsService.sendEvent(
-      'draw_start',
-      currentRoomCode,
-      point.toJson('draw_start'),
-    );
+    wsService.sendEvent('draw_start', currentRoomCode, point.toJson('draw_start'));
   }
 
   void onDrawMove(double x, double y) {
-    if (!isMyTurn) {
-      return;
-    }
-
+    if (!isMyTurn) return;
     final colorToUse = isEraser ? const Color(0xFFFFFFFF) : currentColor;
-
     final point = DrawPoint(
       x: x,
       y: y,
       color: colorToUse,
       size: isEraser ? currentBrushSize * 2 : currentBrushSize,
     );
-
     strokes.add(point);
-
     notifyListeners();
 
-    wsService.sendEvent(
-      'draw_move',
-      currentRoomCode,
-      point.toJson('draw_move'),
-    );
+    wsService.sendEvent('draw_move', currentRoomCode, point.toJson('draw_move'));
   }
 
   void onDrawEnd() {
-    if (!isMyTurn) {
-      return;
-    }
-
+    if (!isMyTurn) return;
     final point = DrawPoint(x: 0, y: 0, isEnd: true);
-
     strokes.add(point);
-
     notifyListeners();
 
     wsService.sendEvent('draw_end', currentRoomCode, point.toJson('draw_end'));
   }
 
   void clearCanvas() {
-    if (!isMyTurn) {
-      return;
-    }
-
+    if (!isMyTurn) return;
     strokes.clear();
-
     notifyListeners();
-
     wsService.sendEvent('canvas_clear', currentRoomCode, {});
   }
 
   void undoStroke() {
-    if (!isMyTurn || strokes.isEmpty) {
-      return;
-    }
-
+    if (!isMyTurn || strokes.isEmpty) return;
     while (strokes.isNotEmpty) {
       final removed = strokes.removeLast();
-
-      if (removed.isStart) {
-        break;
-      }
+      if (removed.isStart) break;
     }
-
     notifyListeners();
-
     wsService.sendEvent('draw_undo', currentRoomCode, {});
   }
 
   void sendGuess(String text) {
-    if (text.trim().isEmpty) {
-      return;
-    }
-
+    if (text.trim().isEmpty) return;
     wsService.sendEvent('guess', currentRoomCode, {'text': text.trim()});
   }
 
   void sendChatMessage(String text) {
-    if (text.trim().isEmpty) {
-      return;
-    }
-
+    if (text.trim().isEmpty) return;
     wsService.sendEvent('chat_message', currentRoomCode, {'text': text.trim()});
   }
 
   void _handleIncomingWebSocketMessage(Map<String, dynamic> data) {
     final type = data['type']?.toString();
-
     final payload = data['payload'] as Map<String, dynamic>? ?? {};
 
     switch (type) {
       case 'game_state':
         roomState = RoomState.fromJson(payload);
-
         notifyListeners();
         break;
 
       case 'player_joined':
         final joinedPlayer = Player.fromJson(payload['player']);
-
-        chatMessages.add(
-          ChatMessage(
-            id: DateTime.now().toString(),
-            senderId: 'system',
-            senderName: 'System',
-            text: '${joinedPlayer.name} joined the room!',
-            isSystem: true,
-          ),
-        );
-
+        chatMessages.add(ChatMessage(
+          id: DateTime.now().toString(),
+          senderId: 'system',
+          senderName: 'System',
+          text: '${joinedPlayer.name} joined the room!',
+          isSystem: true,
+        ));
         if (payload['players'] != null) {
           final updatedPlayers = (payload['players'] as List)
               .map((p) => Player.fromJson(p as Map<String, dynamic>))
               .toList();
-
           if (roomState != null) {
             roomState = RoomState(
               roomId: roomState!.roomId,
@@ -314,34 +271,27 @@ class GameProvider extends ChangeNotifier {
             );
           }
         }
-
         notifyListeners();
         break;
 
       case 'player_left':
         final leftName = payload['playerName'] ?? 'A player';
-
-        chatMessages.add(
-          ChatMessage(
-            id: DateTime.now().toString(),
-            senderId: 'system',
-            senderName: 'System',
-            text: '$leftName left the room.',
-            isSystem: true,
-          ),
-        );
-
+        chatMessages.add(ChatMessage(
+          id: DateTime.now().toString(),
+          senderId: 'system',
+          senderName: 'System',
+          text: '$leftName left the room.',
+          isSystem: true,
+        ));
         if (payload['newHostId'] == myPlayerId) {
           isHost = true;
         }
-
         notifyListeners();
         break;
 
       case 'draw_start':
         if (!isMyTurn) {
           strokes.add(DrawPoint.fromJson(payload));
-
           notifyListeners();
         }
         break;
@@ -349,7 +299,6 @@ class GameProvider extends ChangeNotifier {
       case 'draw_move':
         if (!isMyTurn) {
           strokes.add(DrawPoint.fromJson(payload));
-
           notifyListeners();
         }
         break;
@@ -357,14 +306,12 @@ class GameProvider extends ChangeNotifier {
       case 'draw_end':
         if (!isMyTurn) {
           strokes.add(DrawPoint.fromJson(payload));
-
           notifyListeners();
         }
         break;
 
       case 'canvas_clear':
         strokes.clear();
-
         notifyListeners();
         break;
 
@@ -376,58 +323,43 @@ class GameProvider extends ChangeNotifier {
         } else if (strokes.isNotEmpty) {
           while (strokes.isNotEmpty) {
             final p = strokes.removeLast();
-
-            if (p.isStart) {
-              break;
-            }
+            if (p.isStart) break;
           }
         }
-
         notifyListeners();
         break;
 
       case 'guess_result':
         final status = payload['status'];
-
         if (status == 'correct') {
           final guesserName = payload['playerName'] ?? 'Someone';
-
           final points = payload['points'] ?? 0;
-
-          chatMessages.add(
-            ChatMessage(
-              id: DateTime.now().toString(),
-              senderId: payload['playerId'] ?? '',
-              senderName: guesserName,
-              text: '$guesserName guessed the word! (+$points pts)',
-              isCorrectGuess: true,
-            ),
-          );
+          chatMessages.add(ChatMessage(
+            id: DateTime.now().toString(),
+            senderId: payload['playerId'] ?? '',
+            senderName: guesserName,
+            text: '$guesserName guessed the word! (+$points pts)',
+            isCorrectGuess: true,
+          ));
         } else if (status == 'close') {
-          chatMessages.add(
-            ChatMessage(
-              id: DateTime.now().toString(),
-              senderId: 'system',
-              senderName: 'Hint',
-              text: payload['message'] ?? 'You are close!',
-              isCloseGuess: true,
-            ),
-          );
+          chatMessages.add(ChatMessage(
+            id: DateTime.now().toString(),
+            senderId: 'system',
+            senderName: 'Hint',
+            text: payload['message'] ?? 'You are close!',
+            isCloseGuess: true,
+          ));
         }
-
         notifyListeners();
         break;
 
       case 'chat_message':
-        chatMessages.add(
-          ChatMessage(
-            id: DateTime.now().toString(),
-            senderId: payload['playerId'] ?? '',
-            senderName: payload['playerName'] ?? 'Player',
-            text: payload['text'] ?? '',
-          ),
-        );
-
+        chatMessages.add(ChatMessage(
+          id: DateTime.now().toString(),
+          senderId: payload['playerId'] ?? '',
+          senderName: payload['playerName'] ?? 'Player',
+          text: payload['text'] ?? '',
+        ));
         notifyListeners();
         break;
 
@@ -442,44 +374,17 @@ class GameProvider extends ChangeNotifier {
             currentDrawerId: roomState!.currentDrawerId,
             currentDrawerName: roomState!.currentDrawerName,
             remainingTime: payload['remainingTime'] ?? roomState!.remainingTime,
-            choiceTimeRemaining:
-                payload['choiceTimeRemaining'] ??
-                roomState!.choiceTimeRemaining,
+            choiceTimeRemaining: payload['choiceTimeRemaining'] ?? roomState!.choiceTimeRemaining,
             maskedWord: payload['maskedWord'] ?? roomState!.maskedWord,
             revealedWord: roomState!.revealedWord,
             wordChoices: roomState!.wordChoices,
             players: roomState!.players,
             settings: roomState!.settings,
           );
-
           notifyListeners();
         }
         break;
     }
-  }
-
-  Future<void> quickJoinRoom({
-    required String playerName,
-    String avatar = '🎨',
-  }) async {
-    myAvatar = avatar;
-    final res = await apiService.quickJoin(
-      playerName: playerName,
-      avatar: avatar,
-    );
-    currentRoomCode = res['roomCode'];
-    myPlayerId = res['playerId'];
-    myPlayerName = playerName;
-    isHost = false;
-    roomState = RoomState.fromJson(res['room']);
-    wsService.connect(currentRoomCode);
-    wsService.sendEvent('join_room', currentRoomCode, {
-      'roomCode': currentRoomCode,
-      'playerId': myPlayerId,
-      'playerName': myPlayerName,
-      'avatar': myAvatar,
-    });
-    notifyListeners();
   }
 
   @override

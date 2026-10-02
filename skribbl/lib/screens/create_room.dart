@@ -7,7 +7,11 @@ class CreateRoomScreen extends StatefulWidget {
   final String playerName;
   final String avatar;
 
-  const CreateRoomScreen({super.key, required this.playerName, required this.avatar});
+  const CreateRoomScreen({
+    super.key,
+    required this.playerName,
+    required this.avatar,
+  });
 
   @override
   State<CreateRoomScreen> createState() => _CreateRoomScreenState();
@@ -65,7 +69,14 @@ class _CreateRoomScreenState extends State<CreateRoomScreen> {
     return Scaffold(
       backgroundColor: const Color(0xFF0F172A),
       appBar: AppBar(
-        title: const Text('CREATE ROOM', style: TextStyle(fontWeight: FontWeight.w900, letterSpacing: 1, fontSize: 18)),
+        title: const Text(
+          'CREATE ROOM',
+          style: TextStyle(
+            fontWeight: FontWeight.w900,
+            letterSpacing: 1,
+            fontSize: 18,
+          ),
+        ),
         backgroundColor: Colors.transparent,
         elevation: 0,
         centerTitle: true,
@@ -91,9 +102,17 @@ class _CreateRoomScreenState extends State<CreateRoomScreen> {
                     decoration: BoxDecoration(
                       color: const Color(0xFFEF4444).withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: const Color(0xFFEF4444).withValues(alpha: 0.5)),
+                      border: Border.all(
+                        color: const Color(0xFFEF4444).withValues(alpha: 0.5),
+                      ),
                     ),
-                    child: Text(errorMessage!, style: const TextStyle(color: Color(0xFFEF4444), fontWeight: FontWeight.bold)),
+                    child: Text(
+                      errorMessage!,
+                      style: const TextStyle(
+                        color: Color(0xFFEF4444),
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                   ),
 
                 _buildSectionTitle('GAME SETTINGS'),
@@ -136,7 +155,15 @@ class _CreateRoomScreenState extends State<CreateRoomScreen> {
                 ),
 
                 const SizedBox(height: 12),
-                const Text('Word Category', style: TextStyle(color: Colors.white70, fontSize: 12, fontWeight: FontWeight.w800, letterSpacing: 0.5)),
+                const Text(
+                  'Word Category',
+                  style: TextStyle(
+                    color: Colors.white70,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: 0.5,
+                  ),
+                ),
                 const SizedBox(height: 8),
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -150,16 +177,44 @@ class _CreateRoomScreenState extends State<CreateRoomScreen> {
                       value: category,
                       dropdownColor: const Color(0xFF1E293B),
                       isExpanded: true,
-                      icon: const Icon(Icons.keyboard_arrow_down, color: Colors.white54),
-                      style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w600),
+                      icon: const Icon(
+                        Icons.keyboard_arrow_down,
+                        color: Colors.white54,
+                      ),
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                      ),
                       items: const [
-                        DropdownMenuItem(value: 'all', child: Text('All Categories')),
-                        DropdownMenuItem(value: 'animals', child: Text('Animals')),
-                        DropdownMenuItem(value: 'food', child: Text('Food & Drinks')),
-                        DropdownMenuItem(value: 'objects', child: Text('Everyday Objects')),
-                        DropdownMenuItem(value: 'places', child: Text('Places & Nature')),
-                        DropdownMenuItem(value: 'technology', child: Text('Technology')),
-                        DropdownMenuItem(value: 'actions', child: Text('Actions & Verbs')),
+                        DropdownMenuItem(
+                          value: 'all',
+                          child: Text('All Categories'),
+                        ),
+                        DropdownMenuItem(
+                          value: 'animals',
+                          child: Text('Animals'),
+                        ),
+                        DropdownMenuItem(
+                          value: 'food',
+                          child: Text('Food & Drinks'),
+                        ),
+                        DropdownMenuItem(
+                          value: 'objects',
+                          child: Text('Everyday Objects'),
+                        ),
+                        DropdownMenuItem(
+                          value: 'places',
+                          child: Text('Places & Nature'),
+                        ),
+                        DropdownMenuItem(
+                          value: 'technology',
+                          child: Text('Technology'),
+                        ),
+                        DropdownMenuItem(
+                          value: 'actions',
+                          child: Text('Actions & Verbs'),
+                        ),
                       ],
                       onChanged: (val) {
                         if (val != null) setState(() => category = val);
@@ -175,12 +230,12 @@ class _CreateRoomScreenState extends State<CreateRoomScreen> {
                   value: hintsEnabled,
                   onChanged: (val) => setState(() => hintsEnabled = val),
                 ),
-                _buildToggle(
-                  title: 'Private Room',
-                  subtitle: 'Invite only via code',
-                  value: isPrivate,
-                  onChanged: (val) => setState(() => isPrivate = val),
-                ),
+                // _buildToggle(
+                //   title: 'Private Room',
+                //   subtitle: 'Invite only via code',
+                //   value: isPrivate,
+                //   onChanged: (val) => setState(() => isPrivate = val),
+                // ),
 
                 const SizedBox(height: 32),
                 Container(
@@ -199,11 +254,20 @@ class _CreateRoomScreenState extends State<CreateRoomScreen> {
                       backgroundColor: Colors.blueAccent,
                       foregroundColor: Colors.white,
                       padding: const EdgeInsets.symmetric(vertical: 16),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
                     ),
                     onPressed: isLoading ? null : _handleCreate,
                     child: isLoading
-                        ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
+                        ? const SizedBox(
+                            height: 20,
+                            width: 20,
+                            child: CircularProgressIndicator(
+                              color: Colors.white,
+                              strokeWidth: 2,
+                            ),
+                          )
                         : const Text('CREATE & ENTER LOBBY'),
                   ),
                 ),
@@ -218,7 +282,12 @@ class _CreateRoomScreenState extends State<CreateRoomScreen> {
   Widget _buildSectionTitle(String title) {
     return Text(
       title,
-      style: const TextStyle(color: Color(0xFF3B82F6), fontSize: 12, fontWeight: FontWeight.w900, letterSpacing: 1.5),
+      style: const TextStyle(
+        color: Color(0xFF3B82F6),
+        fontSize: 12,
+        fontWeight: FontWeight.w900,
+        letterSpacing: 1.5,
+      ),
     );
   }
 
@@ -238,8 +307,22 @@ class _CreateRoomScreenState extends State<CreateRoomScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(label, style: const TextStyle(color: Colors.white70, fontSize: 13, fontWeight: FontWeight.w600)),
-              Text(displayValue, style: const TextStyle(color: Color(0xFFF59E0B), fontWeight: FontWeight.w900, fontSize: 14)),
+              Text(
+                label,
+                style: const TextStyle(
+                  color: Colors.white70,
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              Text(
+                displayValue,
+                style: const TextStyle(
+                  color: Color(0xFFF59E0B),
+                  fontWeight: FontWeight.w900,
+                  fontSize: 14,
+                ),
+              ),
             ],
           ),
           SliderTheme(
@@ -273,8 +356,18 @@ class _CreateRoomScreenState extends State<CreateRoomScreen> {
       padding: const EdgeInsets.only(bottom: 8),
       child: SwitchListTile(
         contentPadding: EdgeInsets.zero,
-        title: Text(title, style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w700)),
-        subtitle: Text(subtitle, style: const TextStyle(color: Colors.white38, fontSize: 11)),
+        title: Text(
+          title,
+          style: const TextStyle(
+            color: Colors.white,
+            fontSize: 14,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+        subtitle: Text(
+          subtitle,
+          style: const TextStyle(color: Colors.white38, fontSize: 11),
+        ),
         value: value,
         activeThumbColor: const Color(0xFF3B82F6),
         activeTrackColor: const Color(0xFF3B82F6).withValues(alpha: 0.3),

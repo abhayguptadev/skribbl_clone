@@ -68,7 +68,44 @@ class ApiService {
     throw Exception('Failed to join room: ${response.body}');
   }
 
-  Future<Map<String, dynamic>> getRoomDetail(String roomCode) async {
+  Future<Map<String, dynamic>> quickJoin({
+    required String playerName,
+    String avatar = '🎨',
+  }) async {
+    final uri = Uri.parse('$baseUrl/api/rooms/quick-join/');
+
+    final response = await http.post(
+      uri,
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({
+        'playerName': playerName,
+        'avatar': avatar,
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body) as Map<String, dynamic>;
+    }
+
+    try {
+      final body = jsonDecode(response.body);
+
+      throw Exception(
+        body['error'] ?? 'No running game available.',
+      );
+    } catch (e) {
+      if (e is Exception &&
+          !e.toString().contains('FormatException')) {
+        rethrow;
+      }
+
+      throw Exception('No running game available.');
+    }
+  }
+
+  Future<Map<String, dynamic>> getRoomDetail(
+    String roomCode,
+  ) async {
     final uri = Uri.parse('$baseUrl/api/rooms/$roomCode/');
 
     final response = await http.get(uri);
@@ -79,31 +116,4 @@ class ApiService {
 
     throw Exception('Room not found');
   }
-Future<Map<String, dynamic>> quickJoin({
-  required String playerName,
-  String avatar = '🎨',
-}) async {
-  final uri = Uri.parse('$baseUrl/api/rooms/quick-join/');
-
-  final response = await http.post(
-    uri,
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: jsonEncode({
-      'player_name': playerName,
-      'avatar': avatar,
-    }),
-  );
-
-  final data = jsonDecode(response.body);
-
-  if (response.statusCode == 201 || response.statusCode == 200) {
-    return data as Map<String, dynamic>;
-  }
-
-  throw Exception(
-    data['error'] ?? 'Unable to quick join room',
-  );
-}
 }

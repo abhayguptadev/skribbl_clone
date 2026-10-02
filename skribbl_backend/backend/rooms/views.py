@@ -2,9 +2,45 @@ import uuid
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from game.game_manager import game_manager
+from game.game_manager import game_manager, GamePhase
 from game.word_manager import WORD_BANKS
 from .serializers import CreateRoomSerializer, JoinRoomSerializer
+
+class QuickJoinView(APIView):
+    def post(self, request):
+        player_name = request.data.get("playerName") or request.data.get("player_name")
+        avatar = request.data.get("avatar", "🎨")
+
+        if not player_name or not str(player_name).strip():
+            return Response({"error": "Player name is required"}, status=status.HTTP_400_BAD_REQUEST)
+
+        player_name = str(player_name).strip()
+
+        # Search existing in-memory game_manager rooms for a running game with available capacity
+        running_phases = {GamePhase.WORD_CHOICE, GamePhase.DRAWING, GamePhase.ROUND_RESULT}
+        eligible_room = None
+
+        for room in game_manager.rooms.values():
+            if room.phase in running_phases and not room.settings.is_private:
+                if len(room.players) < room.settings.max_players:
+                    eligible_room = room
+                    break
+
+        if not eligible_room:
+            return Response({"error": "No running game available."}, status=status.HTTP_404_NOT_FOUND)
+
+        player_id = str(uuid.uuid4())[:8]
+        player = eligible_room.add_player(player_id=player_id, name=player_name, is_host=False, avatar=avatar)
+        if not player:
+            return Response({"error": "Could not join running game."}, status=status.HTTP_400_BAD_REQUEST)
+
+        return Response({
+            "message": "Joined running game successfully.",
+            "roomCode": eligible_room.code,
+            "playerId": player_id,
+            "isHost": False,
+            "room": eligible_room.get_public_state(for_player_id=player_id)
+        }, status=status.HTTP_200_OK)
 
 class CreateRoomView(APIView):
     def post(self, request):
@@ -83,70 +119,3 @@ class HealthCheckView(APIView):
             "activeRooms": len(game_manager.rooms),
             "service": "Skribbl Clone Backend"
         }, status=status.HTTP_200_OK)
-class QuickJoinRoomView(APIView):
-
-    def post(self, request):
-        player_name = request.data.get("player_name")
-        avatar = request.data.get("avatar", "🎨")
-
-        if not player_name:
-            return Response(
-                {
-                    "error": "player_name is required."
-                },
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-
-        # Find an already running game with an empty slot
-        room = None
-
-        for active_room in game_manager.rooms.values():
-            if active_room.phase in (
-                "waiting",
-                "word_choice",
-                "drawing",
-                "round_result",
-            ):
-                if len(active_room.players) < active_room.settings.max_players:
-                    room = active_room
-                    break
-
-        if room is None:
-            return Response(
-                {
-                    "error": "No running game available."
-                },
-                status=status.HTTP_404_NOT_FOUND,
-            )
-
-        # Create player ID
-        player_id = str(uuid.uuid4())[:8]
-
-        # Add player directly to the running game
-        player = room.add_player(
-            player_id=player_id,
-            name=player_name,
-            is_host=False,
-            avatar=avatar,
-        )
-
-        if not player:
-            return Response(
-                {
-                    "error": "Could not join the running game."
-                },
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-
-        return Response(
-            {
-                "message": "Joined running game successfully.",
-                "roomCode": room.code,
-                "playerId": player_id,
-                "isHost": False,
-                "room": room.get_public_state(
-                    for_player_id=player_id
-                ),
-            },
-            status=status.HTTP_201_CREATED,
-        )

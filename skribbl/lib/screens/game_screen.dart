@@ -5,6 +5,7 @@ import 'package:skribbl/widget/drawing_canvas.dart';
 import 'package:skribbl/widget/drawing_toolbar.dart';
 import 'package:skribbl/widget/scoreboard.dart';
 import 'package:skribbl/widget/chat.dart';
+
 import 'leaderboard_screen.dart';
 
 class GameScreen extends StatelessWidget {
@@ -18,7 +19,9 @@ class GameScreen extends StatelessWidget {
     if (room == null) {
       return const Scaffold(
         backgroundColor: Color(0xFF0F172A),
-        body: Center(child: CircularProgressIndicator(color: Color(0xFF3B82F6))),
+        body: Center(
+          child: CircularProgressIndicator(color: Color(0xFF3B82F6)),
+        ),
       );
     }
 
@@ -41,73 +44,194 @@ class GameScreen extends StatelessWidget {
           children: [
             Column(
               children: [
-
                 _buildTopBar(context, room, isDrawer, drawerName),
                 Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        const ScoreboardWidget(),
-                        const SizedBox(width: 16),
-                        Expanded(
+                  child: LayoutBuilder(
+                    builder: (context, constraints) {
+                      final isMobile = constraints.maxWidth < 800;
+
+                      if (isMobile) {
+                        return SingleChildScrollView(
+                          padding: const EdgeInsets.all(12),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.stretch,
                             children: [
-                              Expanded(
+                              SizedBox(
+                                height: 250,
+                                child: const ScoreboardWidget(),
+                              ),
+
+                              const SizedBox(height: 12),
+
+                              SizedBox(
+                                height: 320,
                                 child: Container(
                                   decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(20),
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(16),
                                     boxShadow: [
                                       BoxShadow(
-                                        color: Colors.black.withValues(alpha: 0.4),
-                                        blurRadius: 30,
-                                        offset: const Offset(0, 15),
+                                        color: Colors.black.withValues(
+                                          alpha: 0.4,
+                                        ),
+                                        blurRadius: 20,
+                                        offset: const Offset(0, 10),
                                       ),
                                     ],
                                   ),
                                   child: const DrawingCanvasWidget(),
                                 ),
                               ),
+
                               const SizedBox(height: 12),
+
                               if (isDrawer)
                                 const DrawingToolbarWidget()
                               else
                                 Container(
-                                  padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 14,
+                                    horizontal: 16,
+                                  ),
                                   decoration: BoxDecoration(
                                     color: const Color(0xFF1E293B),
                                     borderRadius: BorderRadius.circular(16),
-                                    border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
+                                    border: Border.all(
+                                      color: Colors.white.withValues(
+                                        alpha: 0.05,
+                                      ),
+                                    ),
                                   ),
-                                  child: Row(
+                                  child: const Row(
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
-                                      const Icon(Icons.info_outline_rounded, color: Colors.white38, size: 18),
-                                      const SizedBox(width: 12),
-                                      Text(
-                                        "Wait for your turn to draw! Guess the word to earn points.",
-                                        style: TextStyle(color: Colors.white.withValues(alpha: 0.4), fontSize: 13, fontWeight: FontWeight.w500),
+                                      Icon(
+                                        Icons.info_outline_rounded,
+                                        color: Colors.white38,
+                                        size: 18,
+                                      ),
+                                      SizedBox(width: 10),
+                                      Expanded(
+                                        child: Text(
+                                          "Wait for your turn to draw! Guess the word to earn points.",
+                                          textAlign: TextAlign.center,
+                                          style: TextStyle(
+                                            color: Colors.white54,
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.w500,
+                                          ),
+                                        ),
                                       ),
                                     ],
                                   ),
                                 ),
+
+                              const SizedBox(height: 12),
+
+                              SizedBox(height: 350, child: const ChatWidget()),
                             ],
                           ),
-                        ),
-                        const SizedBox(width: 16),
+                        );
+                      }
 
-                        const ChatWidget(),
-                      ],
-                    ),
+                      // Desktop / Laptop layout
+                      return Padding(
+                        padding: const EdgeInsets.all(16),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            const ScoreboardWidget(),
+
+                            const SizedBox(width: 16),
+
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.stretch,
+                                children: [
+                                  Expanded(
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(20),
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: Colors.black.withValues(
+                                              alpha: 0.4,
+                                            ),
+                                            blurRadius: 30,
+                                            offset: const Offset(0, 15),
+                                          ),
+                                        ],
+                                      ),
+                                      child: const DrawingCanvasWidget(),
+                                    ),
+                                  ),
+
+                                  const SizedBox(height: 12),
+
+                                  if (isDrawer)
+                                    const DrawingToolbarWidget()
+                                  else
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(
+                                        vertical: 16,
+                                        horizontal: 24,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        color: const Color(0xFF1E293B),
+                                        borderRadius: BorderRadius.circular(16),
+                                        border: Border.all(
+                                          color: Colors.white.withValues(
+                                            alpha: 0.05,
+                                          ),
+                                        ),
+                                      ),
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          const Icon(
+                                            Icons.info_outline_rounded,
+                                            color: Colors.white38,
+                                            size: 18,
+                                          ),
+                                          const SizedBox(width: 12),
+                                          Text(
+                                            "Wait for your turn to draw! Guess the word to earn points.",
+                                            style: TextStyle(
+                                              color: Colors.white.withValues(
+                                                alpha: 0.4,
+                                              ),
+                                              fontSize: 13,
+                                              fontWeight: FontWeight.w500,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                ],
+                              ),
+                            ),
+
+                            const SizedBox(width: 16),
+
+                            const ChatWidget(),
+                          ],
+                        ),
+                      );
+                    },
                   ),
                 ),
               ],
             ),
 
             if (room.phase == 'word_choice')
-              _buildWordChoiceOverlay(context, game, room, isDrawer, drawerName),
+              _buildWordChoiceOverlay(
+                context,
+                game,
+                room,
+                isDrawer,
+                drawerName,
+              ),
 
             if (room.phase == 'round_result')
               _buildRoundResultOverlay(context, room),
@@ -117,17 +241,24 @@ class GameScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildTopBar(BuildContext context, dynamic room, bool isDrawer, String drawerName) {
+  Widget _buildTopBar(
+    BuildContext context,
+    dynamic room,
+    bool isDrawer,
+    String drawerName,
+  ) {
     final timer = room.remainingTime;
-    final timerColor = timer <= 10 
-        ? const Color(0xFFEF4444) 
+    final timerColor = timer <= 10
+        ? const Color(0xFFEF4444)
         : (timer <= 25 ? const Color(0xFFF59E0B) : const Color(0xFF22C55E));
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
       decoration: BoxDecoration(
         color: const Color(0xFF1E293B),
-        border: Border(bottom: BorderSide(color: Colors.white.withValues(alpha: 0.05))),
+        border: Border(
+          bottom: BorderSide(color: Colors.white.withValues(alpha: 0.05)),
+        ),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -137,10 +268,22 @@ class GameScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Text('ROUND', style: TextStyle(color: Colors.white38, fontSize: 10, fontWeight: FontWeight.w900, letterSpacing: 1)),
+              const Text(
+                'ROUND',
+                style: TextStyle(
+                  color: Colors.white38,
+                  fontSize: 10,
+                  fontWeight: FontWeight.w900,
+                  letterSpacing: 1,
+                ),
+              ),
               Text(
                 '${room.round} of ${room.totalRounds}',
-                style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 18),
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w900,
+                  fontSize: 18,
+                ),
               ),
             ],
           ),
@@ -151,7 +294,15 @@ class GameScreen extends StatelessWidget {
               if (isDrawer)
                 Column(
                   children: [
-                    const Text('YOUR WORD TO DRAW', style: TextStyle(color: Color(0xFF3B82F6), fontSize: 10, fontWeight: FontWeight.w900, letterSpacing: 1)),
+                    const Text(
+                      'YOUR WORD TO DRAW',
+                      style: TextStyle(
+                        color: Color(0xFF3B82F6),
+                        fontSize: 10,
+                        fontWeight: FontWeight.w900,
+                        letterSpacing: 1,
+                      ),
+                    ),
                     const SizedBox(height: 4),
                     Text(
                       room.revealedWord?.toUpperCase() ?? '',
@@ -179,7 +330,11 @@ class GameScreen extends StatelessWidget {
                     const SizedBox(height: 4),
                     Text(
                       '$drawerName is drawing...',
-                      style: const TextStyle(color: Colors.white54, fontSize: 12, fontWeight: FontWeight.w500),
+                      style: const TextStyle(
+                        color: Colors.white54,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w500,
+                      ),
                     ),
                   ],
                 ),
@@ -214,10 +369,19 @@ class GameScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildWordChoiceOverlay(BuildContext context, GameProvider game, dynamic room, bool isDrawer, String drawerName) {
+  Widget _buildWordChoiceOverlay(
+    BuildContext context,
+    GameProvider game,
+    dynamic room,
+    bool isDrawer,
+    String drawerName,
+  ) {
     return Positioned.fill(
       child: BackdropFilter(
-        filter: ColorFilter.mode(const Color(0xFF0F172A).withValues(alpha: 0.8), BlendMode.srcOver),
+        filter: ColorFilter.mode(
+          const Color(0xFF0F172A).withValues(alpha: 0.8),
+          BlendMode.srcOver,
+        ),
         child: Container(
           color: Colors.transparent,
           child: Center(
@@ -234,9 +398,15 @@ class GameScreen extends StatelessWidget {
                     decoration: BoxDecoration(
                       color: const Color(0xFF1E293B),
                       borderRadius: BorderRadius.circular(24),
-                      border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
+                      border: Border.all(
+                        color: Colors.white.withValues(alpha: 0.1),
+                      ),
                       boxShadow: [
-                        BoxShadow(color: Colors.black.withValues(alpha: 0.5), blurRadius: 40, offset: const Offset(0, 20)),
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.5),
+                          blurRadius: 40,
+                          offset: const Offset(0, 20),
+                        ),
                       ],
                     ),
                     child: Column(
@@ -253,10 +423,13 @@ class GameScreen extends StatelessWidget {
                         ),
                         const SizedBox(height: 12),
                         Text(
-                          isDrawer 
-                              ? 'Choose one of these words to start drawing' 
+                          isDrawer
+                              ? 'Choose one of these words to start drawing'
                               : '$drawerName is choosing a word...',
-                          style: const TextStyle(color: Colors.white54, fontSize: 24),
+                          style: const TextStyle(
+                            color: Colors.white54,
+                            fontSize: 24,
+                          ),
                           textAlign: TextAlign.center,
                         ),
                         const SizedBox(height: 32),
@@ -265,20 +438,28 @@ class GameScreen extends StatelessWidget {
                             spacing: 16,
                             runSpacing: 16,
                             alignment: WrapAlignment.center,
-                            children: (room.wordChoices as List<String>).map((word) {
+                            children: (room.wordChoices as List<String>).map((
+                              word,
+                            ) {
                               return ElevatedButton(
                                 style: ElevatedButton.styleFrom(
-                                  padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 20),
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 32,
+                                    vertical: 20,
+                                  ),
                                   backgroundColor: const Color(0xFF3B82F6),
                                   elevation: 8,
-                                  shadowColor: const Color(0xFF3B82F6).withValues(alpha: 0.4),
+                                  shadowColor: const Color(0xFF3B82F6)
+                                      .withValues(alpha: 0.4),
                                 ),
                                 onPressed: () => game.chooseWord(word),
                                 child: Text(
                                   word.toUpperCase(),
-                                  style: const TextStyle(letterSpacing: 2,
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.w900),
+                                  style: const TextStyle(
+                                    letterSpacing: 2,
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.w900,
+                                  ),
                                 ),
                               );
                             }).toList(),
@@ -287,18 +468,29 @@ class GameScreen extends StatelessWidget {
                           const SizedBox(
                             height: 40,
                             width: 40,
-                            child: CircularProgressIndicator(color: Color(0xFF3B82F6), strokeWidth: 3),
+                            child: CircularProgressIndicator(
+                              color: Color(0xFF3B82F6),
+                              strokeWidth: 3,
+                            ),
                           ),
                         const SizedBox(height: 32),
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 8,
+                          ),
                           decoration: BoxDecoration(
-                            color: const Color(0xFFF59E0B).withValues(alpha: 0.1),
+                            color: const Color(0xFFF59E0B)
+                                .withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(20),
                           ),
                           child: Text(
                             'TIME REMAINING: ${room.choiceTimeRemaining}s',
-                            style: const TextStyle(color: Color(0xFFF59E0B), fontWeight: FontWeight.w900, fontSize: 12),
+                            style: const TextStyle(
+                              color: Color(0xFFF59E0B),
+                              fontWeight: FontWeight.w900,
+                              fontSize: 12,
+                            ),
                           ),
                         ),
                       ],
@@ -316,7 +508,10 @@ class GameScreen extends StatelessWidget {
   Widget _buildRoundResultOverlay(BuildContext context, dynamic room) {
     return Positioned.fill(
       child: BackdropFilter(
-        filter: ColorFilter.mode(const Color(0xFF0F172A).withValues(alpha: 0.8), BlendMode.srcOver),
+        filter: ColorFilter.mode(
+          const Color(0xFF0F172A).withValues(alpha: 0.8),
+          BlendMode.srcOver,
+        ),
         child: Container(
           color: Colors.transparent,
           child: Center(
@@ -333,9 +528,15 @@ class GameScreen extends StatelessWidget {
                     decoration: BoxDecoration(
                       color: const Color(0xFF1E293B),
                       borderRadius: BorderRadius.circular(24),
-                      border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
+                      border: Border.all(
+                        color: Colors.white.withValues(alpha: 0.1),
+                      ),
                       boxShadow: [
-                        BoxShadow(color: Colors.black.withValues(alpha: 0.5), blurRadius: 40, offset: const Offset(0, 20)),
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.5),
+                          blurRadius: 40,
+                          offset: const Offset(0, 20),
+                        ),
                       ],
                     ),
                     child: Column(
@@ -343,10 +544,22 @@ class GameScreen extends StatelessWidget {
                       children: [
                         const Text(
                           'ROUND OVER',
-                          style: TextStyle(color: Colors.white38, fontSize: 12, fontWeight: FontWeight.w900, letterSpacing: 2),
+                          style: TextStyle(
+                            color: Colors.white38,
+                            fontSize: 12,
+                            fontWeight: FontWeight.w900,
+                            letterSpacing: 2,
+                          ),
                         ),
                         const SizedBox(height: 8),
-                        const Text('THE WORD WAS', style: TextStyle(color: Colors.white54, fontSize: 14, fontWeight: FontWeight.w600)),
+                        const Text(
+                          'THE WORD WAS',
+                          style: TextStyle(
+                            color: Colors.white54,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
                         const SizedBox(height: 8),
                         Text(
                           (room.revealedWord ?? 'WORD').toUpperCase(),
@@ -365,24 +578,35 @@ class GameScreen extends StatelessWidget {
                           child: ListView.separated(
                             shrinkWrap: true,
                             itemCount: (room.players as List).length,
-                            separatorBuilder: (_, index) => const SizedBox(height: 8),
+                            separatorBuilder: (_, index) =>
+                                const SizedBox(height: 8),
                             itemBuilder: (context, index) {
                               final p = room.players[index];
                               if (p.roundScore <= 0) return const SizedBox.shrink();
                               return Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 16,
+                                  vertical: 8,
+                                ),
                                 decoration: BoxDecoration(
                                   color: Colors.white.withValues(alpha: 0.03),
                                   borderRadius: BorderRadius.circular(12),
                                 ),
                                 child: Row(
                                   children: [
-                                    Text(p.avatar, style: const TextStyle(fontSize: 24)),
+                                    Text(
+                                      p.avatar,
+                                      style: const TextStyle(fontSize: 24),
+                                    ),
                                     const SizedBox(width: 16),
                                     Expanded(
                                       child: Text(
                                         p.name,
-                                        style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700, fontSize: 16),
+                                        style: const TextStyle(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.w700,
+                                          fontSize: 16,
+                                        ),
                                       ),
                                     ),
                                     Text(
@@ -402,7 +626,11 @@ class GameScreen extends StatelessWidget {
                         const SizedBox(height: 32),
                         const Text(
                           'GET READY FOR THE NEXT ROUND...',
-                          style: TextStyle(color: Colors.white24, fontSize: 12, fontWeight: FontWeight.w800),
+                          style: TextStyle(
+                            color: Colors.white24,
+                            fontSize: 12,
+                            fontWeight: FontWeight.w800,
+                          ),
                         ),
                       ],
                     ),
