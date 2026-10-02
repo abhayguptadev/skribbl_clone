@@ -398,7 +398,7 @@ class GameManager:
     def __new__(cls):
         if cls._instance is None:
             cls._instance = super(GameManager, cls).__new__(cls)
-            cls._instance.rooms: Dict[str, GameRoom] = {}
+            cls._instance.rooms = {}
         return cls._instance
 
     def create_room(self, host_id: str, host_name: str, settings_dict: Optional[Dict[str, Any]] = None, room_code: Optional[str] = None) -> GameRoom:
